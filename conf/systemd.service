@@ -1,0 +1,13 @@
+[Unit]
+Description=Ikiwiki fcgi socket wrap
+After=network.target
+
+[Service]
+Type=simple
+User=__APP__
+Group=__APP__
+WorkingDirectory=__FINALPATH__/
+ExecStart=/usr/bin/spawn-fcgi -s /var/run/fastcgi-__APP__.socket -n -- /usr/sbin/fcgiwrap >> /var/log/__APP__/__APP__.log 2>&1
+
+[Install]
+WantedBy=multi-user.target
