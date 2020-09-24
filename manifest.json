@@ -3,16 +3,16 @@
     "id": "ikiwiki",
     "packaging_format": 1,
     "description": {
-        "en": "An online bibliographic and quotations/notes management and article authoring system. ",
-        "fr": "Expliquez en *quelques* (10~15) mots l'utilité de l'app ou ce qu'elle fait (l'objectif est de donner une idée grossière pour des utilisateurs qui naviguent dans un catalogue de 100+ apps)"
+        "en": "Ikiwiki is a wiki compiler. It converts wiki pages into HTML pages. It stores pages and history in a revision control system such as Subversion or Git. It has support for blogging and podcasting, as well as a large array of plugins.",
+        "fr": "Ikiwiki compile des pages de wiki en pages html destinéies à la publication de page web. Il sauvegarde les page à l'aide de git ou subversion."
     },
     "version": "3.20200202.3-1~ynh1",
     "url": "http://ikiwiki.info",
     "license": "free",
     "maintainer": {
-        "name": "John doe",
-        "email": "john.doe@example.com",
-        "url": "http://example.com"
+        "name": "0ae0",
+        "email": "waem@posteo.de",
+        "url": ""
     },
     "requirements": {
         "yunohost": ">= 3.5",
