@@ -198,8 +198,8 @@ so this one does too.
 
 This wiki is powered by [ikiwiki](http://ikiwiki.info).""">index.mdwn
 
-ynh_script_progression --message="Configuring wiki url = $domain$path_url..." --time --weight=1
-ikiwiki $srcdir $final_path --url=$domain$path_url --rss --allowrss --plugin goodstuff --plugin websetup --adminuser $admin --cgiurl $domain$path_url domain --dumpsetup $config_file
+ynh_script_progression --message="Configuring wiki " --time --weight=1
+ikiwiki $srcdir $final_path --url=$domain$path_url --rss --allowrss --plugin goodstuff --plugin websetup --adminuser $admin --cgiurl $domain$path_url --cgi --wrapper $final_path/ikiwiki.cgi --dumpsetup $config_file
 
 fi
 # Installation with curl
@@ -258,7 +258,7 @@ ynh_store_file_checksum --file="$srcdir/$config_file"
 ###		- Remove the section "REMOVE SERVICE FROM ADMIN PANEL" in the remove script
 ###		- As well as the section "INTEGRATE SERVICE IN YUNOHOST" in the restore script
 
-yunohost service add $app --description "Ikiwiki app" --log "/var/log/$app/$app.log"
+#yunohost service add $app --description "Ikiwiki app" --log "/var/log/$app/$app.log"
 
 ### Additional options starting with 3.8:
 ###
@@ -280,7 +280,7 @@ yunohost service add $app --description "Ikiwiki app" --log "/var/log/$app/$app.
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --time --weight=1
+#ynh_script_progression --message="Starting a systemd service..." --time --weight=1
 
 ### `ynh_systemd_action` is used to start a systemd service for an app.
 ### Only needed if you have configure a systemd service
@@ -291,7 +291,7 @@ ynh_script_progression --message="Starting a systemd service..." --time --weight
 ###		- And the section "STOP SYSTEMD SERVICE" and "START SYSTEMD SERVICE" in the change_url script
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+#ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
 
 #=================================================
 # SETUP SSOWAT
