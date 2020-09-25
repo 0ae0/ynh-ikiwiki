@@ -30,7 +30,6 @@ is_public=$YNH_APP_ARG_IS_PUBLIC
 is_blog=$YNH_APP_ARG_IS_BLOG
 is_wiki=$YNH_APP_ARG_IS_WIKI
 
-
 app=$YNH_APP_INSTANCE_NAME
 
 srcdir="/home/$app/ikiwiki"
@@ -104,9 +103,6 @@ ynh_install_app_dependencies $pkg_dependencies
 
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
 
-# Download, check integrity, uncompress and patch the source from app.src
-#ynh_setup_source --dest_dir="$final_path"
-
 #=================================================
 # NGINX CONFIGURATION
 #=================================================
@@ -129,8 +125,10 @@ ynh_system_user_create --username=$app --home_dir=/home/$app
 #=================================================
 # SPECIFIC SETUP
 #=================================================
-# ...
+# create final_path
 #=================================================
+
+mkdir $final_path
 
 #=================================================
 # SETUP SYSTEMD
@@ -164,10 +162,10 @@ ynh_add_systemd_config
 chown -R $app: $final_path
 
 # Set the app as temporarily public for curl call
-ynh_script_progression --message="Configuring SSOwat..." --time --weight=1
-ynh_app_setting_set --app=$app --key=skipped_uris --value="/"
+#ynh_script_progression --message="Configuring SSOwat..." --time --weight=1
+#ynh_app_setting_set --app=$app --key=skipped_uris --value="/"
 # Reload SSOwat config
-yunohost app ssowatconf
+#yunohost app ssowatconf
 
 # Reload Nginx
 ynh_systemd_action --service_name=nginx --action=reload
@@ -234,23 +232,6 @@ ynh_store_file_checksum --file="$srcdir/$config_file"
 
 # Set permissions to app files
 #chown -R root: $final_path
-
-#=================================================
-# SETUP LOGROTATE
-#=================================================
-ynh_script_progression --message="Configuring log rotation..." --time --weight=1
-
-### `ynh_use_logrotate` is used to configure a logrotate configuration for the logs of this app.
-### Use this helper only if there is effectively a log file for this app.
-### If you're not using this helper:
-###		- Remove the section "BACKUP LOGROTATE" in the backup script
-###		- Remove also the section "REMOVE LOGROTATE CONFIGURATION" in the remove script
-###		- As well as the section "RESTORE THE LOGROTATE CONFIGURATION" in the restore script
-###		- And the section "SETUP LOGROTATE" in the upgrade script
-
-# Use logrotate to manage application logfile(s)
-ynh_use_logrotate
-
 #=================================================
 # INTEGRATE SERVICE IN YUNOHOST
 #=================================================
