@@ -30,7 +30,7 @@ is_public=$YNH_APP_ARG_IS_PUBLIC
 is_blog=$YNH_APP_ARG_IS_BLOG
 is_wiki=$YNH_APP_ARG_IS_WIKI
 
-srcdir="/home/$app/ikiwiki"
+srcdir="/home/$admin/ikiwiki"
 config_file="ikiwiki.setup" 
 
 ### If it's a multi-instance app, meaning it can be installed several times independently
@@ -91,8 +91,8 @@ ynh_script_progression --message="Installing dependencies..." --time --weight=1
 ###		- As well as the section "REINSTALL DEPENDENCIES" in the restore script
 ###		- And the section "UPGRADE DEPENDENCIES" in the upgrade script
 
-ynh_install_app_dependencies $pkg_dependencies
-
+#ynh_install_app_dependencies $pkg_dependencies
+apt-get install $pkg_dependencies
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
@@ -101,9 +101,6 @@ ynh_install_app_dependencies $pkg_dependencies
 ### `ynh_setup_source` use the file conf/app.src
 
 ynh_app_setting_set --app=$app --key=final_path --value=$final_path
-
-# Download, check integrity, uncompress and patch the source from app.src
-#ynh_setup_source --dest_dir="$final_path"
 
 #=================================================
 # NGINX CONFIGURATION
@@ -122,13 +119,6 @@ ynh_script_progression --message="Configuring system user..." --time --weight=1
 
 # Create a system user
 ynh_system_user_create --username=$app --home_dir=/home/$app
-
-
-#=================================================
-# SPECIFIC SETUP
-#=================================================
-# ...
-#=================================================
 
 #=================================================
 # SETUP SYSTEMD
@@ -161,15 +151,6 @@ ynh_add_systemd_config
 # Set right permissions for curl install
 chown -R $app: $final_path
 
-# Set the app as temporarily public for curl call
-ynh_script_progression --message="Configuring SSOwat..." --time --weight=1
-ynh_app_setting_set --app=$app --key=skipped_uris --value="/"
-# Reload SSOwat config
-yunohost app ssowatconf
-
-# Reload Nginx
-ynh_systemd_action --service_name=nginx --action=reload
-
 #Normal wiki setup
 if [ $is_wiki -eq  1]
 then
@@ -189,9 +170,6 @@ ynh_script_progression --message="Configuring wiki url = $domain$path_url..." --
 ikiwiki $srcdir $final_path --url=$domain$path_url --dumpsetup $config_file
 
 fi
-# Installation with curl
-ynh_script_progression --message="Finalizing installation..." --time --weight=1
-
 # Remove the public access
 if [ $is_public -eq 0 ]
 then
@@ -209,50 +187,6 @@ ynh_script_progression --message="Finalizing installation..." --time --weight=1
 
 #ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$srcdir/$config_file"
 
-#=================================================
-# STORE THE CONFIG FILE CHECKSUM
-#=================================================
-
-### `ynh_store_file_checksum` is used to store the checksum of a file.
-### That way, during the upgrade script, by using `ynh_backup_if_checksum_is_different`,
-### you can make a backup of this file before modifying it again if the admin had modified it.
-
-# Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$srcdir/$config_file"
-
-#=================================================
-# GENERIC FINALIZATION
-#=================================================
-# SECURE FILES AND DIRECTORIES
-#=================================================
-
-### For security reason, any app should set the permissions to root: before anything else.
-### Then, if write authorization is needed, any access should be given only to directories
-### that really need such authorization.
-
-# Set permissions to app files
-#chown -R root: $final_path
-
-#=================================================
-# SETUP LOGROTATE
-#=================================================
-ynh_script_progression --message="Configuring log rotation..." --time --weight=1
-
-### `ynh_use_logrotate` is used to configure a logrotate configuration for the logs of this app.
-### Use this helper only if there is effectively a log file for this app.
-### If you're not using this helper:
-###		- Remove the section "BACKUP LOGROTATE" in the backup script
-###		- Remove also the section "REMOVE LOGROTATE CONFIGURATION" in the remove script
-###		- As well as the section "RESTORE THE LOGROTATE CONFIGURATION" in the restore script
-###		- And the section "SETUP LOGROTATE" in the upgrade script
-
-# Use logrotate to manage application logfile(s)
-ynh_use_logrotate
-
-#=================================================
-# INTEGRATE SERVICE IN YUNOHOST
-#=================================================
-
 ### `yunohost service add` integrates a service in YunoHost. It then gets 
 ### displayed in the admin interface and through the others `yunohost service` commands.
 ### (N.B. : this line only makes sense if the app adds a service to the system!)
@@ -262,23 +196,6 @@ ynh_use_logrotate
 ###		- As well as the section "INTEGRATE SERVICE IN YUNOHOST" in the restore script
 
 yunohost service add $app --description "Ikiwiki app" --log "/var/log/$app/$app.log"
-
-### Additional options starting with 3.8:
-###
-### --needs_exposed_ports "$port" a list of ports that needs to be publicly exposed
-###                               which will then be checked by YunoHost's diagnosis system
-###                               (N.B. DO NOT USE THIS is the port is only internal !!!)
-###
-### --test_status "some command"  a custom command to check the status of the service
-###                               (only relevant if 'systemctl status' doesn't do a good job)
-###
-### --test_conf "some command"    some command similar to "nginx -t" that validates the conf of the service
-###
-### Re-calling 'yunohost service add' during the upgrade script is the right way
-### to proceed if you later realize that you need to enable some flags that
-### weren't enabled on old installs (be careful it'll override the existing
-### service though so you should re-provide all relevant flags when doing so)
-###
 
 #=================================================
 # START SYSTEMD SERVICE
