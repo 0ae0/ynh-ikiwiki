@@ -29,6 +29,7 @@ path_url=$YNH_APP_ARG_PATH
 is_public=$YNH_APP_ARG_IS_PUBLIC
 is_blog=$YNH_APP_ARG_IS_BLOG
 is_wiki=$YNH_APP_ARG_IS_WIKI
+admin=$YNH_APP_ARG_ADMIN
 
 app=$YNH_APP_INSTANCE_NAME
 
@@ -149,7 +150,7 @@ ynh_script_progression --message="Configuring a systemd service..." --time --wei
 ###		- And the section "SETUP SYSTEMD" in the upgrade script
 
 # Create a dedicated systemd config
-ynh_add_systemd_config
+# ynh_add_systemd_config
 
 #=================================================
 # SETUP APPLICATION WITH CURL
@@ -210,8 +211,9 @@ fi
 
 ynh_script_progression --message="Finalizing installation..." --time --weight=1
 
-#ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$srcdir/$config_file"
+ynh_replace_string --match_string="add_plugins: []" --replace_string="add_plugins:\n- goodstuff\n- websetup" --target_file="$srcdir/$config_file"
 
+ynh_replace_string --match_string="adminuser: []" --replace_string="adminuser:\n- $admin" --target_file="$srcdir/$config_file"
 #=================================================
 # STORE THE CONFIG FILE CHECKSUM
 #=================================================

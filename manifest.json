@@ -43,6 +43,15 @@
                 "example": "/ikiwiki",
                 "default": "/ikiwiki"
             },
+	    {
+                "name": "admin",
+                "type": "user",
+                "ask": {
+                    "en": "Choose an admin user",
+                    "fr": "Choisissez l'administrateur"
+                },
+                "example": "johndoe"
+            },
             {
                 "name": "is_public",
                 "type": "boolean",
