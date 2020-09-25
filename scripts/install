@@ -30,6 +30,9 @@ is_public=$YNH_APP_ARG_IS_PUBLIC
 is_blog=$YNH_APP_ARG_IS_BLOG
 is_wiki=$YNH_APP_ARG_IS_WIKI
 
+
+app=$YNH_APP_INSTANCE_NAME
+
 srcdir="/home/$app/ikiwiki"
 config_file="ikiwiki.setup" 
 
@@ -43,7 +46,6 @@ config_file="ikiwiki.setup"
 ### The app instance name is probably what interests you most, since this is
 ### guaranteed to be unique. This is a good unique identifier to define installation path,
 ### db names, ...
-app=$YNH_APP_INSTANCE_NAME
 
 #=================================================
 # CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
