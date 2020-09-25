@@ -15,8 +15,7 @@
         "url": ""
     },
     "requirements": {
-        "yunohost": ">= 3.5",
-        "perl": ">= 5.10"
+        "yunohost": ">= 3.5"
     },
     "multi_instance": true,
     "services": [
