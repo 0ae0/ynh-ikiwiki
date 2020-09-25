@@ -76,6 +76,7 @@ ynh_script_progression --message="Storing installation settings..." --time --wei
 ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
 ynh_app_setting_set --app=$app --key=is_public --value=$is_public
+ynh_app_setting_set --app=$app --key=admin --value=$admin
 
 #=================================================
 # STANDARD MODIFICATIONS
@@ -93,8 +94,8 @@ ynh_script_progression --message="Installing dependencies..." --time --weight=1
 ###		- As well as the section "REINSTALL DEPENDENCIES" in the restore script
 ###		- And the section "UPGRADE DEPENDENCIES" in the upgrade script
 
-ynh_install_app_dependencies $pkg_dependencies
-
+#ynh_install_app_dependencies $pkg_dependencies
+apt-get install $pkg_dependencies
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
@@ -171,7 +172,7 @@ ynh_script_progression --message="Configuring a systemd service..." --time --wei
 ### forms.
 
 # Set right permissions for curl install
-chown -R $app: $final_path
+#chown -R $app: $final_path
 
 # Set the app as temporarily public for curl call
 #ynh_script_progression --message="Configuring SSOwat..." --time --weight=1
@@ -199,7 +200,7 @@ so this one does too.
 This wiki is powered by [ikiwiki](http://ikiwiki.info).""">index.mdwn
 
 ynh_script_progression --message="Configuring wiki " --time --weight=1
-ikiwiki $srcdir $final_path --url=$domain$path_url --rss --allowrss --plugin goodstuff --plugin websetup --adminuser $admin --cgiurl $domain$path_url --cgi --wrapper $final_path/ikiwiki.cgi --dumpsetup $config_file
+ikiwiki $srcdir $final_path --url=$domain$path_url --rss --allowrss --plugin goodstuff --plugin websetup --adminuser $admin --cgiurl $domain$path_url/$app.cgi --cgi --wrapper $final_path/$app.cgi --dumpsetup $config_file
 
 fi
 # Installation with curl
