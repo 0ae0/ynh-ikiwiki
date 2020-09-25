@@ -128,8 +128,9 @@ ynh_system_user_create --username=$app --home_dir=/home/$app/
 # create final_path
 #=================================================
 
+ynh_script_progression --message="Make final path $final_path" --time --weight=1
 mkdir $final_path
-cat /etc/passwd | grep $app
+cat /etc/passwd | grep $app 1>&2
 
 #=================================================
 # SETUP SYSTEMD
