@@ -119,8 +119,8 @@ ynh_add_nginx_config
 ynh_script_progression --message="Configuring system user... with $app" --time --weight=1
 
 # Create a system user
+mkdir /home/$app/ 
 ynh_system_user_create --username=$app --home_dir=/home/$app/
-
 
 #=================================================
 # SPECIFIC SETUP
