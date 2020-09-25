@@ -32,6 +32,9 @@ is_blog=$YNH_APP_ARG_IS_BLOG
 is_wiki=$YNH_APP_ARG_IS_WIKI
 password=$YNH_APP_ARG_PASSWORD
 
+srcdir="/home/$app/ikiwiki"
+config_file="ikiwiki.setup" 
+
 ### If it's a multi-instance app, meaning it can be installed several times independently
 ### The id of the app as stated in the manifest is available as $YNH_APP_ID
 ### The instance number is available as $YNH_APP_INSTANCE_NUMBER (equals "1", "2", ...)
@@ -74,15 +77,10 @@ ynh_app_setting_set --app=$app --key=domain --value=$domain
 ynh_app_setting_set --app=$app --key=path --value=$path_url
 ynh_app_setting_set --app=$app --key=admin --value=$admin
 ynh_app_setting_set --app=$app --key=is_public --value=$is_public
-ynh_app_setting_set --app=$app --key=language --value=$language
 
 #=================================================
 # STANDARD MODIFICATIONS
 #=================================================
-# FIND AND OPEN A PORT
-#=================================================
-ynh_script_progression --message="Configuring firewall..." --time --weight=1
-
 #=================================================
 # INSTALL DEPENDENCIES
 #=================================================
@@ -101,8 +99,6 @@ ynh_install_app_dependencies $pkg_dependencies
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Setting up source files..." --time --weight=1
-
 ### `ynh_setup_source` is used to install an app from a zip or tar.gz file,
 ### downloaded from an upstream source, like a git repository.
 ### `ynh_setup_source` use the file conf/app.src
@@ -130,25 +126,6 @@ ynh_script_progression --message="Configuring system user..." --time --weight=1
 # Create a system user
 ynh_system_user_create --username=$app --home_dir=/home/$app
 
-
-#=================================================
-# PHP-FPM CONFIGURATION
-#=================================================
-
-#ynh_script_progression --message="Configuring php-fpm..." --time --weight=1
-
-### `ynh_add_fpm_config` is used to set up a PHP config.
-### You can remove it if your app doesn't use PHP.
-### `ynh_add_fpm_config` will use the files conf/php-fpm.conf
-### If you're not using these lines:
-###		- You can remove these files in conf/.
-###		- Remove the section "BACKUP THE PHP-FPM CONFIGURATION" in the backup script
-###		- Remove also the section "REMOVE PHP-FPM CONFIGURATION" in the remove script
-###		- As well as the section "RESTORE THE PHP-FPM CONFIGURATION" in the restore script
-###		With the reload at the end of the script.
-###		- And the section "PHP-FPM CONFIGURATION" in the upgrade script
-
-# Create a dedicated php-fpm config
 
 #=================================================
 # SPECIFIC SETUP
@@ -196,9 +173,27 @@ yunohost app ssowatconf
 # Reload Nginx
 ynh_systemd_action --service_name=nginx --action=reload
 
+#Normal wiki setup
+if [ $is_wiki -eq  1]
+then
+mkdir $srcdir
+cd $srcdir
+ynh_script_progression --message="Configuring wiki in $srcdir..." --time --weight=1
+echo """ Welcome to your new wiki.
+
+All wikis are supposed to have a [[SandBox]],
+so this one does too.
+
+----
+
+This wiki is powered by [ikiwiki](http://ikiwiki.info).""">index.mdwn
+
+ynh_script_progression --message="Configuring wiki url = $domain$path_url..." --time --weight=1
+ikiwiki $srcdir $final_path --url=$domain$path_url --dumpsetup $config_file
+
+fi
 # Installation with curl
-#ynh_script_progression --message="Finalizing installation..." --time --weight=1
-#ynh_local_curl "/INSTALL_PATH" "key1=value1" "key2=value2" "key3=value3"
+ynh_script_progression --message="Finalizing installation..." --time --weight=1
 
 # Remove the public access
 if [ $is_public -eq 0 ]
@@ -213,7 +208,9 @@ fi
 ### `ynh_replace_string` is used to replace a string in a file.
 ### (It's compatible with sed regular expressions syntax)
 
-#ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$final_path/CONFIG_FILE"
+ynh_script_progression --message="Finalizing installation..." --time --weight=1
+
+#ynh_replace_string --match_string="match_string" --replace_string="replace_string" --target_file="$srcdir/$config_file"
 
 #=================================================
 # STORE THE CONFIG FILE CHECKSUM
@@ -224,7 +221,7 @@ fi
 ### you can make a backup of this file before modifying it again if the admin had modified it.
 
 # Calculate and store the config file checksum into the app settings
-ynh_store_file_checksum --file="$final_path/CONFIG_FILE"
+ynh_store_file_checksum --file="$srcdir/$config_file"
 
 #=================================================
 # GENERIC FINALIZATION
