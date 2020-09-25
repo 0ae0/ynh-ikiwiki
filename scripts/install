@@ -120,7 +120,12 @@ ynh_add_nginx_config
 ynh_script_progression --message="Configuring system user... with $app" --time --weight=1
 
 # Create a system user
+if [ ! -d "/home/$app/" ] 
+then
+
 mkdir /home/$app/ 
+
+fi
 ynh_system_user_create --username=$app --home_dir=/home/$app/
 
 #=================================================
@@ -130,8 +135,12 @@ ynh_system_user_create --username=$app --home_dir=/home/$app/
 #=================================================
 
 ynh_script_progression --message="Make final path $final_path" --time --weight=1
+if [ ! -d "$final_path" ] 
+then
+
 mkdir $final_path
-cat /etc/passwd | grep $app 1>&2
+
+fi
 
 #=================================================
 # SETUP SYSTEMD
@@ -190,7 +199,7 @@ so this one does too.
 This wiki is powered by [ikiwiki](http://ikiwiki.info).""">index.mdwn
 
 ynh_script_progression --message="Configuring wiki url = $domain$path_url..." --time --weight=1
-ikiwiki $srcdir $final_path --url=$domain$path_url --dumpsetup $config_file
+ikiwiki $srcdir $final_path --url=$domain$path_url --rss --allowrss --plugin goodstuff --plugin websetup --adminuser $admin --cgiurl $domain$path_url domain --dumpsetup $config_file
 
 fi
 # Installation with curl
@@ -211,9 +220,9 @@ fi
 
 ynh_script_progression --message="Finalizing installation..." --time --weight=1
 
-ynh_replace_string --match_string="add_plugins: []" --replace_string="add_plugins:\n- goodstuff\n- websetup" --target_file="$srcdir/$config_file"
+#ynh_replace_string --match_string="add_plugins: []" --replace_string="add_plugins:\n- goodstuff\n- websetup" --target_file="$srcdir/$config_file"
 
-ynh_replace_string --match_string="adminuser: []" --replace_string="adminuser:\n- $admin" --target_file="$srcdir/$config_file"
+#ynh_replace_string --match_string="adminuser: []" --replace_string="adminuser:\n- $admin" --target_file="$srcdir/$config_file"
 #=================================================
 # STORE THE CONFIG FILE CHECKSUM
 #=================================================
