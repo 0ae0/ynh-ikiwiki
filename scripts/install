@@ -116,10 +116,10 @@ ynh_add_nginx_config
 #=================================================
 # CREATE DEDICATED USER
 #=================================================
-ynh_script_progression --message="Configuring system user..." --time --weight=1
+ynh_script_progression --message="Configuring system user... with $app" --time --weight=1
 
 # Create a system user
-ynh_system_user_create --username=$app --home_dir=/home/$app
+ynh_system_user_create --username=$app --home_dir=/home/$app/
 
 
 #=================================================
@@ -129,6 +129,7 @@ ynh_system_user_create --username=$app --home_dir=/home/$app
 #=================================================
 
 mkdir $final_path
+cat /etc/passwd | grep $app
 
 #=================================================
 # SETUP SYSTEMD
@@ -173,9 +174,10 @@ ynh_systemd_action --service_name=nginx --action=reload
 #Normal wiki setup
 if [ $is_wiki -eq  1 ]
 then
+
+ynh_script_progression --message="Configuring wiki in $srcdir..." --time --weight=1
 mkdir $srcdir
 cd $srcdir
-ynh_script_progression --message="Configuring wiki in $srcdir..." --time --weight=1
 echo """ Welcome to your new wiki.
 
 All wikis are supposed to have a [[SandBox]],
